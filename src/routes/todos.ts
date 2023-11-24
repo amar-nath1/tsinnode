@@ -1,6 +1,8 @@
 
 import { Router } from "express";
 import { Todo } from "../models/todo";
+type requestBody = {text:string};
+type requestParams = {todoId:string};
 let todos:Todo[] = [] 
 
 const router = Router()
@@ -10,16 +12,18 @@ router.get('/',(req,res,next)=>{
 })
 
 router.post('/todo',(req,res,next)=>{
+    const body = req.body as requestBody
     const newTodo:Todo = {
         id:new Date().toISOString(),
-        text:req.body.text
+        text:body.text
     }
 
     todos.push(newTodo)
     res.status(200).json({added:true})
 })
 router.put('/todo/:todoId',(req,res,next)=>{
-    const todoIndex = todos.findIndex(todo=>todo.id === req.params.todoId)
+    const params = req.params as requestParams
+    const todoIndex = todos.findIndex(todo=>todo.id === params.todoId)
     if (todoIndex>=0){
         todos[todoIndex] = {
             id:todos[todoIndex].id,
@@ -31,7 +35,8 @@ router.put('/todo/:todoId',(req,res,next)=>{
 })
 
 router.delete('/todo/:todoId',(req,res,next)=>{
-        todos = todos.filter(todoItem=>todoItem.id!==req.params.todoId)
+    const params = req.params as requestParams
+        todos = todos.filter(todoItem=>todoItem.id!==params.todoId)
         res.status(200).json({deleted:true})
 })
 
